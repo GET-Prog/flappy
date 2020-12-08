@@ -1,5 +1,5 @@
 import pygame
-from flappy.helpers import get_image_path
+from flappy.helpers import get_image_path, get_sound_path
 from flappy.constants import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
@@ -24,6 +24,7 @@ class Bird(pygame.sprite.Sprite):
             )
         ]
 
+        self.wing_sound = self.get_wing_sound()
         self.current_angle = 0
         self.current_speed = SPEED
         self.current_image = 0
@@ -48,9 +49,14 @@ class Bird(pygame.sprite.Sprite):
         self.current_speed += GRAVITY
         self.rect[1] += self.current_speed
 
+    def get_wing_sound(self):
+        sound_path = get_sound_path("wing.wav")
+        return pygame.mixer.Sound(sound_path)
+
     def bump(self):
         self.current_speed = -SPEED
         self.current_angle = UP_ANGLE
+        self.wing_sound.play()
 
     def get_surface(self, filename, angle=0, scale=1.5):
         return pygame.transform.rotozoom(

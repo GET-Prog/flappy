@@ -11,7 +11,7 @@ from flappy.constants import (
     MIN_PIPE_OFFSET,
     MAX_PIPE_OFFSET,
 )
-from flappy.helpers import get_image_path
+from flappy.helpers import get_image_path, get_sound_path
 from flappy.models.ground import Ground
 from flappy.models.pipe import Pipe
 from flappy.models.bird import Bird
@@ -26,6 +26,7 @@ class Runner:
 
         self.clock = pygame.time.Clock()
         self.background = self.create_background()
+        self.run_background_music()
 
         self.bird_group = pygame.sprite.Group()
         self.ground_group = pygame.sprite.Group()
@@ -41,6 +42,11 @@ class Runner:
 
         for p in self.create_random_pipes(SCREEN_WIDTH + DISTANCE_BETWEEN_PIPES):
             self.pipe_group.add(p)
+
+    def run_background_music(self):
+        sound_path = get_sound_path("background.wav")
+        sound = pygame.mixer.Sound(sound_path)
+        sound.play(-1)
 
     @staticmethod
     def create_background():
