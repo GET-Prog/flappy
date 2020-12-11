@@ -12,10 +12,12 @@ class Pipe(pygame.sprite.Sprite):
             (PIPE_WIDTH, PIPE_HEIGHT),
         )
 
+        self.inverted = inverted
+        self.scored = False
         self.rect = self.image.get_rect()
         self.rect[0] = width
 
-        if inverted:
+        if self.inverted:
             self.image = pygame.transform.flip(self.image, False, True)
             self.rect[1] = SCREEN_HEIGHT - y_pos - offset - PIPE_HEIGHT
         else:

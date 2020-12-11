@@ -10,8 +10,9 @@ from flappy.constants import (
     MAX_PIPE_Y,
     MIN_PIPE_OFFSET,
     MAX_PIPE_OFFSET,
+    SCORE_FONT_SIZE,
 )
-from flappy.helpers import get_image_path, get_sound_path
+from flappy.helpers import get_image_path, get_sound_path, create_pygame_font
 from flappy.models.ground import Ground
 from flappy.models.pipe import Pipe
 from flappy.models.bird import Bird
@@ -32,6 +33,9 @@ class Runner:
         self.ground_group = pygame.sprite.Group()
         self.pipe_group = pygame.sprite.Group()
 
+        self.score_font = create_pygame_font(SCORE_FONT_SIZE, bold=True)
+        self.score = 0
+
         self.bird_group.add(Bird())
 
         for i in range(2):
@@ -47,6 +51,9 @@ class Runner:
         sound_path = get_sound_path("background.wav")
         sound = pygame.mixer.Sound(sound_path)
         sound.play(-1)
+
+    def create_score_text(self, score):
+        return self.score_font.render(score, True, (255, 255, 255))
 
     @staticmethod
     def create_background():
@@ -95,9 +102,23 @@ class Runner:
 
         return p1, p2
 
+    def play_coin_sound(self):
+        sound_path = get_sound_path("coin.wav")
+        sound = pygame.mixer.Sound(sound_path)
+        sound.play()
+
+    def update_score(self):
+        for bird in self.bird_group:
+            for pipe in self.pipe_group:
+                bird_center = (bird.rect[0] + bird.rect[2]) / 2
+                pipe_center = (pipe.rect[0] + pipe.rect[2]) / 2
+                if not pipe.scored and pipe.inverted and bird_center >= pipe_center:
+                    pipe.scored = True
+                    self.score += 1
+                    self.play_coin_sound()
+
     def update_frame(self):
         self.screen.blit(self.background, (0, 0))
-
         self.update_ground()
         self.update_pipe()
 
@@ -105,6 +126,12 @@ class Runner:
             group.update()
             group.draw(self.screen)
 
+        self.update_score()
+
+        self.screen.blit(
+            self.create_score_text(str(self.score)),
+            ((SCREEN_WIDTH - (SCORE_FONT_SIZE / 2)) / 2, SCREEN_HEIGHT / 8),
+        )
         pygame.display.update()
 
     def run(self):
